@@ -1,11 +1,11 @@
 # angsd_pipeline
 
 - Run all commands from the angsd_pipeline folder
-- For an overview of the pipeline please see : 
+- For an overview of the pipeline please see :
 https://drive.google.com/file/d/14bmwOkdbdfSsfNDrYNxR2V8kHZyNuIlm/view?usp=sharing
 
 ## 00_DEPENDANCIES
-- Install angsd & associated programs : 
+- Install angsd & associated programs :
 http://www.popgen.dk/angsd/index.php/ANGSD
 
 - add angsd to the path in .bashrc
@@ -20,28 +20,34 @@ export PATH="/home/camer78/Softwares/angsd2/angsd:$PATH"
 export PATH="/home/camer78/Softwares/angsd2/angsd/misc:$PATH"
 ```
 
-- Install NGSAdmix (maybe in the misc folder, else export its path) : 
+- Install NGSAdmix (maybe in the misc folder, else export its path) :
 http://www.popgen.dk/software/index.php/NgsAdmix
 
-install pcangsd (maybe in the misc folder) & check if you have python2
+- Install pcangsd (maybe in the misc folder) & check if you have python2 :
 http://www.popgen.dk/software/index.php/PCAngsd
-copy the path into 01_config.sh PCA_ANGSD_PATH=~/Softwares/pcangsd
 
-for all script file, you may edit the header to put your email adress and adjust cpu/memory/time/allocation and slurm partition 
+- Copy the path into 01_config.sh PCA_ANGSD_PATH=~/Softwares/pcangsd
+
+- For all script files, you may edit the header to put your email adress and adjust cpu/memory/time/allocation and slurm partition
 
 ## 01_PREPARE_DATA
 
-input: 
-- bam-files
+input:
+
+- bam-files :
+
 They must be aligned to the reference, indexed and sorted, named like "id_sex_pop_group_blablabla.sorted.bam.
-They can  be kept in original folder, just know the path to their location from the angsd_pipeline folder
+
+They can  be kept in their original folder. You can specify the path to their location from the angsd_pipeline folder
 
 insert this path in BAM_PATH= in the 01_config.sh
 
 Useful for most analysis:
 
 - info.txt in 02_info folder: a file listing the bamfile names ordered  with a column for any relevant information on the individuals
+
 for follow-up analyses with R ideally: col1=bam_filename, col2=id, col3=sex, col4=pop, col5=group, col6=group ...
+
 - pop.txt in 02_info folder : a file listing population names with one item by line (there can be several files if we aimed at analysing different grouping, group.txt)
 
 Necessary:
@@ -75,7 +81,7 @@ edit script if you want to add another way of grouping (group.txt)
 ./01_scripts/02_list_bamfiles.sh
 
 ## 03_RUN_INITIAL_ANALYSIS_ON_WHOLE_DATASET
-this script will work on all bamfiles and calculate saf, maf & genotype likelihood on the whole dataset. It will output in 
+this script will work on all bamfiles and calculate saf, maf & genotype likelihood on the whole dataset. It will output in
 02_info folder the list of SNP which passed the MIN_MAF and PERCENT_IND filters & their Major-minor alleles (sites_*)
 
 maybe edit the number of cpu NB_CPU and allocated memory/time
@@ -106,8 +112,8 @@ source 01_scripts/01_config.sh
 Rscript 01_scripts/Rscripts/visualise_pca.r "$MIN_MAF" "$PERCENT_IND"
 
 ## 05_ADMIXTURE_ANALYSIS
-this script will work on all individuals using the beagle genotype likelihood and perform an admixture analysis. 
-this requires NGSadmix to be installed and its path export in the bashrc. 
+this script will work on all individuals using the beagle genotype likelihood and perform an admixture analysis.
+this requires NGSadmix to be installed and its path export in the bashrc.
 NGS admiw will explore all number of population between K_MIN and K_MAX as provided in the 01_config.sh.
 
 maybe edit NB_CPU=1 & edit K_MIN and K_MAX in the 01_config.sh
@@ -123,20 +129,20 @@ BAM_LIST=02_info/bam.filelist
 Rscript 01_scripts/Rscripts/visualise_admix.r "$MIN_MAF" "$PERCENT_IND" "$K_MIN" "$K_MAX" "$BAM_LIST"
 
 ## 06_CALCULATE_ALLELES_FREQUENCIES_BY_POP
-this script will work on bamfiles by population and calculate saf  & maf. 
-It will run on the list of sites determined at step 3 (filter on global population). 
+this script will work on bamfiles by population and calculate saf  & maf.
+It will run on the list of sites determined at step 3 (filter on global population).
 In addition it will filter for sites with at least one read in a minimum proportion of individuals within each pop
 
 maybe edit cpu & choose on which list of pop run the analyses
 
-NB_CPU=1 & POP_FILE1=02_info/pop.txt 
+NB_CPU=1 & POP_FILE1=02_info/pop.txt
 
 sbatch 01_scripts/06_saf_maf_by_pop.sh
 
 ## 07_CALCULATE_PAIRWISE_FST
 This script will use the saf by population calculated at step 07 and calculate SFS and FST
 
-maybe edit 
+maybe edit
 
 NB_CPU=1 #change accordingly in SLURM header
 
@@ -163,7 +169,7 @@ those two scripts can do a gwas either with binary phenoty "_bin" or quantitativ
 
 phenotype files should be put in 02_info
 - bin_pheno.txt #this file must be one single column with phenotype coded as 1 or 2, each line is one individual in the same order as bamfile
-- quant_pheno.txt #this file must be one single column with quantitative phenotype, each line is one individual in the same order as bamfiles. 
+- quant_pheno.txt #this file must be one single column with quantitative phenotype, each line is one individual in the same order as bamfiles.
 Beware, the quantitative gwas is made to include a covariable (for instance sex) coded as binary # change the $COV if needed
 Missing data must be coded -999
 see example files in 00_archives
@@ -177,21 +183,21 @@ important: edit window size - this is a number of SNPs
 
 sbatch 01_scripts/10_pca_by_window.sh
 
-This script will call a python script written by Eric Normandeau to split the begale files into windows of a given size within 
+This script will call a python script written by Eric Normandeau to split the begale files into windows of a given size within
 each chromosome/scaffold. They are stored into beagle_by_window folder
 Then, it will run pcangsd on each window of X SNPs. Covariances matrices are stored into cov_by_window folder
 
 sbatch 01_scripts/10_run_local_pca
-important: edit window size and choose whether using or not a complementary info file (provide path) on which we will test 
-correlation between the PC1 scores of each window and the given variable (this could be for instance a phenotype, a score along a 
+important: edit window size and choose whether using or not a complementary info file (provide path) on which we will test
+correlation between the PC1 scores of each window and the given variable (this could be for instance a phenotype, a score along a
 PC axis determined on the whole dataset or a single LG, etc...)
 
 This call a R script and will need library lostruct and clustertend.
-It applies the method proposed in Li, H., & Ralph, P. (2019). Local PCA shows how the effect of population structure differs 
+It applies the method proposed in Li, H., & Ralph, P. (2019). Local PCA shows how the effect of population structure differs
 along the genome. Genetics, 211(1), 289-304.
 
-In addition, for each window, we test for a clustering tendency by calculating hopkins statistics and we calculate whether PC1 
-correlates with PC1-2-3 of the global PCA (and if given with other quantitative variables) Output several figures to visualize 
+In addition, for each window, we test for a clustering tendency by calculating hopkins statistics and we calculate whether PC1
+correlates with PC1-2-3 of the global PCA (and if given with other quantitative variables) Output several figures to visualize
 that.
 
 ## ANALYSING_MAF_SELECTION_TESTS_ETC
