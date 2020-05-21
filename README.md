@@ -1,21 +1,26 @@
 # angsd_pipeline
 
-#run all commands from the angsd_pipeline folder
-#for an overview of the pipeline please see
+- Run all commands from the angsd_pipeline folder
+- For an overview of the pipeline please see : 
 https://drive.google.com/file/d/14bmwOkdbdfSsfNDrYNxR2V8kHZyNuIlm/view?usp=sharing
 
 ## 00_DEPENDANCIES
-install angsd & associated programs
+- Install angsd & associated programs : 
 http://www.popgen.dk/angsd/index.php/ANGSD
 
-add angsd to the path in .bashrc
+- add angsd to the path in .bashrc
 
-add the misc folder (containing RealSFS, theta stat etc to the path in .bashrc
-
+```bash
 export PATH="/home/camer78/Softwares/angsd2/angsd:$PATH"
-export PATH="/home/camer78/Softwares/angsd2/angsd/misc:$PATH"
+```
 
-install NGSAdmix (maybe in the misc folder, else export its path)
+- add the misc folder (containing RealSFS, theta stat etc to the path in .bashrc
+
+```bash
+export PATH="/home/camer78/Softwares/angsd2/angsd/misc:$PATH"
+```
+
+- Install NGSAdmix (maybe in the misc folder, else export its path) : 
 http://www.popgen.dk/software/index.php/NgsAdmix
 
 install pcangsd (maybe in the misc folder) & check if you have python2
