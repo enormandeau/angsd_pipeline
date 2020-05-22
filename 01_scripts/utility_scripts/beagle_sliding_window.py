@@ -13,7 +13,7 @@ import gzip
 import sys
 import os
 
-# Classes
+# Functions
 def myopen(_file, mode="rt"):
     if _file.endswith(".gz"):
         return gzip.open(_file, mode=mode)

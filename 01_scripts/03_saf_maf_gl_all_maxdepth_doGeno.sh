@@ -15,13 +15,14 @@ REGIONS="-rf 02_info/regions_25kb_100snp.txt" #optional edit with your region se
 #REGIONS=" " # to remove the options to focus on a limited number of regions
 
 # Important: Move to directory where job was submitted
-cd $SLURM_SUBMIT_DIR
+#cd $SLURM_SUBMIT_DIR
 
 module load angsd
 ulimit -S -n 2048
 
 #prepare variables - avoid to modify
 source 01_scripts/01_config.sh
+
 N_IND=$(wc -l 02_info/bam.filelist | cut -d " " -f 1)
 MIN_IND_FLOAT=$(echo "($N_IND * $PERCENT_IND)"| bc -l)
 MIN_IND=${MIN_IND_FLOAT%.*} 

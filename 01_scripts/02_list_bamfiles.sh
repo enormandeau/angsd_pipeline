@@ -1,4 +1,6 @@
-###this script will make a list of all bamfiles and several list by population
+#!/bin/bash
+
+# make a list of all bamfiles and several lists by population
 
 #variables
 source 01_scripts/01_config.sh
@@ -11,11 +13,11 @@ POP_FILE1=02_info/pop.txt #pop list n° 1
 
 cat $POP_FILE1 | while read i
 do
-echo $i
-ls $BAM_PATH/*$i*.bam > 02_info/"$i"bam.filelist
+    echo $i
+    ls $BAM_PATH/*$i*.bam > 02_info/"$i"bam.filelist
 done
 
-##possible to re-do this for another list of pop, beware it is not the same names, or it will overwrite
+# possible to re-do this for another list of pop, make sure to use other names or it will be overwritten
 #POP_FILE2=02_info/group.txt #pop list n° 2
 
 #cat $POP_FILE2 | while read i
