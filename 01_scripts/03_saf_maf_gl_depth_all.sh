@@ -10,12 +10,12 @@
 
 ###this script will work on all bamfiles and calculate saf, maf & genotype likelihood
 #maybe edit
-NB_CPU=5 #change accordingly in SLURM header
+NB_CPU=40 #change accordingly in SLURM header
 #REGIONS="-rf 02_info/regions_25kb_100snp.txt" #optional edit with your region selected file
 #REGIONS="-r LG6" # to remove the options to focus on a limited number of regions
 
 # Important: Move to directory where job was submitted
-cd $SLURM_SUBMIT_DIR
+#cd $SLURM_SUBMIT_DIR
 
 module load angsd
 ulimit -S -n 2048
@@ -34,7 +34,7 @@ echo "filter on allele frequency = $MIN_MAF"
 ####Calculate the SAF, MAF and GL
 angsd -P $NB_CPU -nQueueSize 50 \
 -doMaf 1 -dosaf 1 -GL 2 -doGlf 2 -doMajorMinor 1 -doCounts 1 \
--doDepth 1 -maxDepth 1000 -dumpCounts 2 \
+-doDepth 1 -maxDepth 5000 -dumpCounts 2 \
 -anc 02_info/genome.fasta -remove_bads 1 -minMapQ 30 -minQ 20 \
 -minInd $MIN_IND -minMaf $MIN_MAF -setMaxDepth $MAX_DEPTH \
 -b 02_info/bam.filelist \
@@ -67,6 +67,3 @@ angsd sites index 02_info/sites_all_maf"$MIN_MAF"_pctind"$PERCENT_IND"_maxdepth"
 #Eric propose a much shorter version using bash to cut the 4 columns of the mafs.gz. but then angsd is unable to index it
 #I can't find the problem, so I came back to older solution with R which works
 #gunzip -c 03_saf_maf_gl_all/all_maf"$MIN_MAF"_pctind_"$PERCENT_IND".mafs.gz | cut -f -4 > 02_info/sites_all_maf"$MIN_MAF"_pctind_"$PERCENT_IND"
-
-
-
