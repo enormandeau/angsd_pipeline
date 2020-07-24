@@ -1,3 +1,5 @@
+*.backup
+*.bai
 *.bam
 *.fa
 *.fas
@@ -6,8 +8,9 @@
 *.fq
 *.gz
 *.sam
+*_filtered
 *~
-log*
+00_archive/*
 02_info/*
 03_saf_maf_gl_all/*
 04_pca/*
@@ -16,3 +19,5 @@ log*
 07_fst_by_pop_pair/*
 08_thetas/*
 09_gwas/*
+99_logfiles/*
+log*
