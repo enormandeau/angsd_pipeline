@@ -2,26 +2,26 @@
 BAM_PATH=./bamfiles
 
 #path to pcaangsd
-PCA_ANGSD_PATH=/project/lbernatchez/programs/pcangsd 
+PCA_ANGSD_PATH=/project/lbernatchez/programs/pcangsd
 
 #filter : will keep SNP above this allele frequency (over all individuals)
-MIN_MAF=0.01 
+MIN_MAF=0.01
 
 #filter : will keep SNP with at least one read for this percentage of individuals (over all individuals in step 03, and within each pop at step 07)
-PERCENT_IND=0.5 
+PERCENT_IND=0.5
 
 #filter: will keep SNP with at least a coverage of this factor multiplied by the number of ind - across all ind. usually set 2-4
 #times the coverage to remove repeated regions
-MAX_DEPTH_FACTOR=2
+MAX_DEPTH_FACTOR=20
 
 #window size for sliding window FST & Thetas
-WINDOW=25000 
+WINDOW=25000
 
 #window step
-WINDOW_STEP=5000 
+WINDOW_STEP=5000
 
 #min nb of pop to consider for NGS admix
-K_MIN=2 
+K_MIN=1
 
 #maximum nb of pop to consider for NGS admix
-K_MAX=5 
+K_MAX=5
