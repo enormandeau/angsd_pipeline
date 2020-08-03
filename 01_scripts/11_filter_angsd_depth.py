@@ -103,9 +103,10 @@ output_files["mafs"] = myopen(
 
 # SNP containers
 left_snps = []
-central_snp = None
-rigtht_snps = []
-surrounding = []
+center_snp = None
+right_snps = []
+
+counter = 0
 
 # Write headers to output files
 for f in input_files:
@@ -113,6 +114,10 @@ for f in input_files:
 
 # Read lines from all 3 files one at a time
 for mafs_line in input_files["mafs"]:
+
+    #counter += 1
+    #if counter >= 2000:
+    #    sys.exit()
 
     # Position info (scaffold<str>, position<int>)
     pos = mafs_line.strip().split()[:2]
@@ -124,15 +129,6 @@ for mafs_line in input_files["mafs"]:
 
     # Format mafs for later use
     mafs = mafs_line.strip().split()
-    mafs = [
-            mafs[0],
-            int(mafs[1]),
-            mafs[2],
-            mafs[3],
-            mafs[4],
-            float(mafs[5]),
-            int(mafs[6])
-            ]
 
     # Format beagle for later use
     beagle = input_files["beagle"].readline().strip().split()
@@ -143,17 +139,54 @@ for mafs_line in input_files["mafs"]:
 
     info = (pos, mafs, beagle, counts)
 
-    if not central_snp:
-        central_snp = info
+    if not center_snp:
+        center_snp = info
 
-    elif len(rigtht_snps) < window_size:
-        rigtht_snps.append(info)
-        print(len(rigtht_snps))
+    elif len(right_snps) < window_size:
+        right_snps.append(info)
 
     else:
-        pass
-        # - Filter
+        # Add the new SNP
+        right_snps.append(info)
+
+        # Informations of the SNP being treated
+        p, m, b, c = center_snp
+
+        # Filters
+        keep_snp = True
+
+        # MAF
+        maf = float(m[5])
+        if maf < 0.1:
+            keep_snp = False
+
+        # Surrounding SNPs
+        surrounding_snps = [
+                x for x in left_snps + right_snps if
+                x[0][0] == p[0] and ((x[0][1] - window_size) <= p[1] <= (x[0][1] + window_size))
+                ]
+
+        if len(surrounding_snps) > 0:
+            keep_snp = False
+
+        # TODO If MAF of surrounding is low enough, keep?
+        elif len(surrounding_snps) <= 3:
+            pass
+
+        # TODO other filters?
+
+        # Write wanted SNP infos in the output files
+        if keep_snp:
+            output_files["mafs"].write("\t".join([str(x) for x in m]) + "\n")
+            output_files["beagle"].write("\t".join([str(x) for x in b]) + "\n")
+            output_files["counts"].write("\t".join([str(x) for x in c]) + "\n")
+
         # - move SNPs from right to left
+        if len(left_snps) >= window_size:
+            left_snps.pop(0)
+
+        left_snps.append(center_snp)
+        center_snp = right_snps.pop(0)
 
 # Close file handles
 for f in input_files:
