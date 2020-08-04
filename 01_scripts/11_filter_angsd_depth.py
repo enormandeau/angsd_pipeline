@@ -2,7 +2,13 @@
 """Filter SNPS from the output of 03_saf_maf_gl_depth_all.sh
 
 Usage:
-    <program> angsd_output_folder filtered_folder window_size
+    <program> angsd_output_folder filtered_folder window_size min_maf max_maf_other_snps max_surrounding_snps
+
+Where:
+    window_size is the number of base pairs on each side where surrounding SNPs are searched
+    min_maf is the lowest accepted MAF value for a SNP of interest
+    max_maf_other_snps is the highest accepted MAF value for a surounding SNP
+    max_surrounding_snps is the maximal number of SNPs with max_maf_other_snps accepted in window_size
 
 The script will read all needed files in the angsd_output_folder and use the
 information in all of them to filter the SNPs in one pass.
@@ -40,6 +46,9 @@ try:
     angsd_output_folder = sys.argv[1]
     filtered_folder = sys.argv[2]
     window_size = int(sys.argv[3])
+    min_maf = float(sys.argv[4])
+    max_maf_other_snps = float(sys.argv[5])
+    max_surrounding_snps = int(sys.argv[6])
 except:
     print(__doc__)
     sys.exit(1)
@@ -157,7 +166,7 @@ for mafs_line in input_files["mafs"]:
 
         # MAF
         maf = float(m[5])
-        if maf < 0.1:
+        if maf < min_maf:
             keep_snp = False
 
         # Surrounding SNPs
@@ -166,14 +175,14 @@ for mafs_line in input_files["mafs"]:
                 x[0][0] == p[0] and ((x[0][1] - window_size) <= p[1] <= (x[0][1] + window_size))
                 ]
 
-        if len(surrounding_snps) > 0:
+        if len(surrounding_snps) > max_surrounding_snps:
             keep_snp = False
 
-        # TODO If MAF of surrounding is low enough, keep?
-        elif len(surrounding_snps) <= 3:
-            pass
-
-        # TODO other filters?
+        # If MAF of surrounding SNPs is low enough, keep?
+        else:
+            for s in surrounding_snps:
+                if float(s[1][5]) > max_maf_other_snps:
+                    keep_snp = False
 
         # Write wanted SNP infos in the output files
         if keep_snp:

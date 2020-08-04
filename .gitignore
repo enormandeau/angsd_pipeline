@@ -9,6 +9,7 @@
 *.gz
 *.sam
 *_filtered
+*filtered*
 *~
 00_archive/*
 02_info/*
